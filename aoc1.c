@@ -9,22 +9,30 @@ int abs(int x) {
     }
 }
 
-int min_nth(int* l, const int length, const int n) {
-    int ktmp = 0;
-    for (int j=0, j<length, j++) {
-        if (l[ktmp] > l[j])
-            ktmp = j;
+int is_in(int* l, const int length, const int i) {
+    for (int j=0; j<length; j++) {
+        if (i == l[j])
+            return 1;
     }
-    for (int i=1, i<n, i++) {
+    return 0;
+}
+
+int min_nth(int* l, const int length, const int n) {
+    int ltmp[n];
+    ltmp[0] = 0;
+    for (int j=0; j<length; j++) {
+        if (l[ltmp[0]] > l[j])
+            ltmp[0] = j;
+    }
+    for (int i=1; i<n; i++) {
         int k = 0;
-        for (int j=0, j<length, j++) {
-            if ((j != ktmp) && (l[j] >= l[ktmp]) && (l[k] < l[j]))
+        for (int j=0; j<length; j++) {
+            if ((is_in(ltmp, i, j) != 1) && (l[j] >= l[i-1]) && (l[k] < l[j]))
                 k = j;
         }
-        ktmp = k;
-        }
+        ltmp[i] = k;
     }
-    return ktmp;
+    return ltmp[n-1];
 }
 
 int main() {
@@ -63,8 +71,8 @@ int main() {
     }
 
     int dist = 0;
-    for (int i=1, i<=length, i++) {
-        dist += abs(l1[min_nth(l1, length, i)], l2[min_nth(l2, length, i)]);
+    for (int i=1; i<=length; i++) {
+        dist += abs(l1[min_nth(l1, length, i)] - l2[min_nth(l2, length, i)]);
     }
-    printf("%d", dist);
+    printf("%d\n", dist);
 }
