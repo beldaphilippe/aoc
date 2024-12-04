@@ -1,4 +1,4 @@
-DAY=1
+DAY=2
 MAIN=aoc$(DAY)
 TOOLS=aoctools.c
 

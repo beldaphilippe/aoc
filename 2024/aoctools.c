@@ -62,14 +62,14 @@ bool is_in_char(const char ch, char* l) {
     return false;
 }
 
-char **split(char* line, char *delimiter) {
+char **split(char* line, char* delimiters) {
     char **split_line = malloc(sizeof(char *) * 1000);
     int k = 0; // position in line
     int j = 0; // index of current word
     int l = 0; // length of current word
     char cword[100]; // current word being read
-    while (line[k] != '\0') {
-        if (is_in_char(line[k], delimiters)) {
+    while (true) {
+        if ((is_in_char(line[k], delimiters)) || (line[k] == '\0')) {
             if (l != 0) {
                 cword[l] = '\0';
                 split_line[j] = malloc(sizeof(char)*(l+1));
@@ -77,17 +77,19 @@ char **split(char* line, char *delimiter) {
                 l = 0;
                 j++;
             }
+            if (line[k] == '\0') break;
         } else {
             cword[l] = line[k];
             l++;
         }
         k++;
     }
-    paste("\0", split_line[j]);
+    split_line[j] = malloc(sizeof(char));
+    split_line[j][0] = '\0';
     return split_line;
 }
 
-char** get_lines_file(const char* file_path, const int line_nb, const int line_length, char* delimiters) {
+char** get_lines_file(const char* file_path, const int line_nb, const int line_length) {
     FILE *file_ptr;
     file_ptr = fopen(file_path, "r");
     if (file_ptr == NULL) {
@@ -99,11 +101,15 @@ char** get_lines_file(const char* file_path, const int line_nb, const int line_l
     int j = 0; // col index
     while (ch != EOF) {
         txt[i] = malloc(sizeof(char)*line_length);
+        j = 0;
         while ((ch != '\n') && (ch != EOF)) {
             txt[i][j] = ch;
+            ch = fgetc(file_ptr);
             j++;
         }
+        txt[i][j] = '\0';
         i++;
+        ch = fgetc(file_ptr);
     }
     return txt;
 }
