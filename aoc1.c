@@ -1,78 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "aoctools.h"
 
-int abs(int x) {
-    if (x >= 0) {
-        return x;
-    } else {
-        return -x;
-    }
-}
-
-int is_in(int* l, const int length, const int i) {
-    for (int j=0; j<length; j++) {
-        if (i == l[j])
-            return 1;
-    }
-    return 0;
-}
-
-int min_nth(int* l, const int length, const int n) {
-    int ltmp[n];
-    ltmp[0] = 0;
-    for (int j=0; j<length; j++) {
-        if (l[ltmp[0]] > l[j])
-            ltmp[0] = j;
-    }
-    for (int i=1; i<n; i++) {
-        int k = 0;
-        for (int j=0; j<length; j++) {
-            if ((is_in(ltmp, i, j) != 1) && (l[j] >= l[i-1]) && (l[k] < l[j]))
-                k = j;
-        }
-        ltmp[i] = k;
-    }
-    return ltmp[n-1];
+int comp(const void* x, const void* y) {
+    int i1 = *((const int*) x);
+    int i2 = *((const int*) y);
+    return i1 - i2;
 }
 
 int main() {
-    FILE *file_ptr;
-    file_ptr = fopen("input.txt", "r");
-
-    if (file_ptr == NULL) {
-        printf("error : the file cannot be opened\n");
-        return EXIT_FAILURE;
-    }
-
-    char ch = fgetc(file_ptr);
+    char** txt = my_split("input.txt", " \n");
     const int length = 1000;
+    int dist = 0;
     int l1[length];
     int l2[length];
-    int i=0;
-    int x=0, y=0;
-    while (ch != EOF) {
-        while (ch != ' ') {
-            x = 10*x + ch - '0';
-            ch = fgetc(file_ptr);
-        }
-        while ((ch = fgetc(file_ptr)) == ' ');
-        while ((ch != '\n') && (ch != EOF)) {
-            y = 10*y + ch - '0';
-            ch = fgetc(file_ptr);
-        }
-        l1[i] = x;
-        l2[i] = y;
-        x = 0;
-        y = 0;
-        i++;
-        if (ch != EOF) {
-            ch = fgetc(file_ptr);
-        }
+    for (int i=0; i<length; i++) {
+        l1[i] =  str_to_int(txt[2*i]);
+        l2[i] =  str_to_int(txt[2*i+1]);
     }
+    qsort(l1, length, sizeof(int), comp);
+    qsort(l2, length, sizeof(int), comp);
+    for (int i=0; i<length; i++) {
+        /*printf("%d, %d\n", str_to_int(txt[2*i]), str_to_int(txt[2*i+1]));*/
+        dist += abs(l1[i]-l2[i]);
+    }
+    printf("Partie 1 : %d\n", dist);
 
-    int dist = 0;
-    for (int i=1; i<=length; i++) {
-        dist += abs(l1[min_nth(l1, length, i)] - l2[min_nth(l2, length, i)]);
+    int sim = 0;
+    for (int i=0; i<length; i++) {
+        sim += l1[i]*times_in(l1[i], l2, length);
     }
-    printf("%d\n", dist);
+    printf("Partie 2 : %d\n", sim);
+    return 0;
 }
